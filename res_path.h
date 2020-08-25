@@ -7,13 +7,11 @@
 /*
  * Get the resource path for resources located in res/subDir
  * It's assumed the project directory is structured like:
- * bin/
- *  the executable
  * res/
  *  Lesson1/
  *  Lesson2/
  *
- * Paths returned will be x64/Debug/res/Lesson1/
+ * Paths returned will be res/Lesson1/
  */
 std::string getResourcePath(const std::string& subDir = "")
 {
@@ -43,7 +41,7 @@ std::string getResourcePath(const std::string& subDir = "")
 			std::cerr << "Error getting resource path: " << SDL_GetError() << std::endl;
 			return "";
 		}
-		baseRes = baseRes + "res" + PATH_SEP;
+		baseRes = baseRes + ".." + PATH_SEP + "res" + PATH_SEP;
 	}
 	return subDir.empty() ? baseRes : baseRes + subDir + PATH_SEP;
 }
