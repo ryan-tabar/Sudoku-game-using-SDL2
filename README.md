@@ -1,2 +1,2 @@
-# SDL-Test
-Testing SDL
+# SDL2-Test
+Testing SDL2
