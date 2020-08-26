@@ -4,15 +4,7 @@
 #include <string>
 #include <SDL.h>
 
-/*
- * Get the resource path for resources located in res/subDir
- * It's assumed the project directory is structured like:
- * res/
- *  Lesson1/
- *  Lesson2/
- *
- * Paths returned will be res/Lesson1/
- */
+/* Get the resource path for resources located in res/subDir */
 std::string getResourcePath(const std::string& subDir = "")
 {
 	// We need to choose the path seperator properly base on which

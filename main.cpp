@@ -1,103 +1,70 @@
-//https://www.willusher.io/sdl2%20tutorials/2013/08/17/lesson-2-dont-put-everything-in-main
-//http://lazyfoo.net/tutorials/SDL/index.php
-
 #include <SDL.h> 
+#include <SDL_image.h>
 #include <iostream>
-#include <string>
-#include "res_path.h"
-#include "cleanup.h"
+#include "CleanUp.h"
+#include "SudokuGrid.h"
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-
-void logSDLError(std::ostream& os, const std::string &msg)
-{
-	os << msg << " error:" << SDL_GetError() << std::endl;
-}
-
-SDL_Texture* loadTexture(const std::string& file, SDL_Renderer* ren)
-{
-	SDL_Texture* texture = nullptr;
-	SDL_Surface* loadedImage = SDL_LoadBMP(file.c_str());
-	if (loadedImage != nullptr)
-	{
-		texture = SDL_CreateTextureFromSurface(ren, loadedImage);
-		SDL_FreeSurface(loadedImage);
-		if (texture == nullptr)
-		{
-			logSDLError(std::cout, "CreateTextureFromSurface");
-		}
-	}
-	else
-	{
-		logSDLError(std::cout, "LoadBMP");
-	}
-	return texture;
-
-}
+constexpr int SCREEN_WIDTH = 810;
+constexpr int SCREEN_HEIGHT = 810;
 
 int main(int argc, char* argv[])
 {
 	// Initalise video subsystem
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
-		logSDLError(std::cout, "SDL_Init");
+		std::cout << "SDL_init" << " error: " << SDL_GetError() << std::endl;
 		return 1;
 	}
 	
-	// Openning a Window
-	SDL_Window* win = SDL_CreateWindow("Hello World!", 100, 100, 640, 480, SDL_WINDOW_SHOWN);
-	if (win == nullptr)
+	// Create window
+	SDL_Window* Window = SDL_CreateWindow("Sudoku", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	if (Window == nullptr)
 	{
-		logSDLError(std::cout, "SDL_CreateWindow");
+		std::cout << "SDL_CreateWindow" << " error: " << SDL_GetError() << std::endl;
 		SDL_Quit();
 		return 1;
 	}
 
-	// Creating a Renderer
-	SDL_Renderer* ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (ren == nullptr)
+	// Create renderer
+	SDL_Renderer* Renderer = SDL_CreateRenderer(Window, -1, 0);
+	if (Renderer == nullptr)
 	{
-		cleanup(win);
-		logSDLError(std::cout, "SDL_CreateRender");
+		std::cout << "SDL_CreateRenderer" << " error: " << SDL_GetError() << std::endl;
 		SDL_Quit();
 		return 1;
 	}
+	
+	// Grid colours
+	SDL_Color ClearColour = { 255, 255, 255, SDL_ALPHA_OPAQUE };
+	SDL_Color GridColour = { 0, 0, 0, SDL_ALPHA_OPAQUE };
 
-	// Loading a Bitmap Image
-	std::string imagePath = getResourcePath("Lesson1") + "hello.bmp";
-	std::cout << imagePath << std::endl;
-	SDL_Surface* bmp = SDL_LoadBMP(imagePath.c_str());
-	if (bmp == nullptr)
-	{
-		cleanup(ren, win);
-		logSDLError(std::cout, "SDL_LoadBMP");
-		SDL_Quit();
-		return 1;
-	}
+	// Loop variables
+	bool Quit = false;
+	SDL_Event E;
 
-	// Upload Bitmap Image to renderer
-	SDL_Texture* tex = SDL_CreateTextureFromSurface(ren, bmp);
-	SDL_FreeSurface(bmp);
-	if (tex == nullptr)
+	while (!Quit)
 	{
-		cleanup(ren, win);
-		logSDLError(std::cout, "SDL_CreateTextureFromSurface");
-		SDL_Quit();
-		return 1;
-	}
+		/*----------------------------Handle events on queue----------------------------*/
+		while (SDL_PollEvent(&E) != 0)
+		{
+			// User requests quit
+			if (E.type == SDL_QUIT)
+			{
+				Quit = true;
+			}
+		}
+		/*----------------------------Creating a Sudoku grid----------------------------*/
+		SudokuGrid S_Grid(Renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+		S_Grid.ClearRenderer(ClearColour);
+		S_Grid.DrawGrid(GridColour);
+		S_Grid.UpdateGrid();
+		/*------------------------------------------------------------------------------*/
+		
 
-	// Drawing the Texture
-	for (int i = 0; i < 3; ++i)
-	{
-		SDL_RenderClear(ren);
-		SDL_RenderCopy(ren, tex, NULL, NULL);
-		SDL_RenderPresent(ren);
-		SDL_Delay(1000);
 	}
 
 	// Cleaning Up
-	cleanup(tex, ren, win);
+	CleanUp(Window, Renderer); // surface gets cleared up with window
 	SDL_Quit();
 
 	return 0;
