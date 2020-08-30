@@ -13,14 +13,6 @@ bool Init(SDL_Window*& Window, SDL_Renderer*& Renderer, TTF_Font*& Font, int Fon
 		success = false;
 	}
 
-	// Intialise PNG loading
-	int imgFlags = IMG_INIT_PNG;
-	if (!(IMG_Init(imgFlags) & imgFlags))
-	{
-		std::cout << "SDL_image could not initialise! Error: " << IMG_GetError() << std::endl;
-		success = false;
-	}
-
 	// Initialise SDL_ttf
 	if (TTF_Init() == -1)
 	{
@@ -70,6 +62,5 @@ void Close(SDL_Window*& Window, SDL_Renderer*& Renderer, TTF_Font*& Font)
 
 	// Quit
 	SDL_Quit();
-	IMG_Quit();
 	TTF_Quit();
 }

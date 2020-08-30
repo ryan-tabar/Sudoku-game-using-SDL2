@@ -1,6 +1,5 @@
 #pragma once
 #include <SDL.h> 
-#include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <string>
 #include <iostream>
@@ -20,34 +19,30 @@ private:
 
 public:
 	// Intialise variables
-	LTexture(SDL_Renderer* inputRenderer = nullptr);
+	LTexture();
 
 	// Deallocates memory
 	~LTexture();
 
+	// Set renderer
+	void setRenderer(SDL_Renderer* const inputRenderer);
+	
+	// Get renderer
+	SDL_Renderer* getRenderer() const;
+
 	// Set SDL_Rect
-	void setTextureRect(SDL_Rect& inputRect);
+	void setTextureRect(const SDL_Rect& const inputRect);
 
 	// Get SDL_Rect
-	SDL_Rect getTextureRect();
-
-	// Loads image from specified path
-	bool loadFromFile(std::string& path);
+	SDL_Rect getTextureRect() const;
 
 	// Create image from font string
-	bool loadFromRenderedText(std::string textureText, SDL_Color textColour, TTF_Font* Font);
+	bool loadFromRenderedText(const std::string& const textureText, const SDL_Color& const textColour, TTF_Font* const font);
 
 	// Deallocates texture
 	void free();
 
 	// Renders texture at given point
-	void renderTexture();
-
-	// Gets image dimensions
-	int getWidth();
-	int getHeight();
-
-	// Get renderer
-	SDL_Renderer* getRenderer();
+	void renderTexture() const;
 
 };

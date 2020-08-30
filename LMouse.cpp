@@ -1,25 +1,25 @@
 #include "LMouse.h"
 
-LButton::LButton(SDL_Renderer* inputRenderer)
-	:LTexture(inputRenderer), mCurrentState(LButtonState::BUTTON_MOUSE_OUT), mButtonRect({ 0, 0, 0, 0 }), mSelected(false), mNumber("")
+LButton::LButton()
+	:mCurrentState(LButtonState::BUTTON_MOUSE_OUT), mButtonRect({ 0, 0, 0, 0 }), mSelected(false), mNumber("")
 {
 
 }
 
-void LButton::setButtonRect(SDL_Rect& inputRect)
+void LButton::setButtonRect(const SDL_Rect& const inputRect)
 {
     mButtonRect = inputRect;
 }
 
-SDL_Rect LButton::getButtonRect()
+SDL_Rect LButton::getButtonRect() const
 {
     return mButtonRect;
 }
 
-void LButton::handleEvent(SDL_Event* E, LButton* currentSelected)
+void LButton::handleEvent(const SDL_Event* const Event, LButton*& currentButtonSelected)
 {
     //If mouse event happened
-    if (E->type == SDL_MOUSEMOTION || E->type == SDL_MOUSEBUTTONDOWN || E->type == SDL_MOUSEBUTTONUP)
+    if (Event->type == SDL_MOUSEMOTION || Event->type == SDL_MOUSEBUTTONDOWN || Event->type == SDL_MOUSEBUTTONUP)
     {
         // Get mouse position
         int x, y;
@@ -60,7 +60,7 @@ void LButton::handleEvent(SDL_Event* E, LButton* currentSelected)
         else
         { 
             // Set mouse over State
-            switch (E->type)
+            switch (Event->type)
             {
             case SDL_MOUSEMOTION:
                 mCurrentState = LButtonState::BUTTON_MOUSE_OVER_MOTION;
@@ -68,13 +68,15 @@ void LButton::handleEvent(SDL_Event* E, LButton* currentSelected)
 
             case SDL_MOUSEBUTTONDOWN:
                 mCurrentState = LButtonState::BUTTON_MOUSE_DOWN;
-                // check if current button selected is not a nullptr and this.m Selected is false
-                if (currentSelected != nullptr && mSelected == false)
+                // check if this.mSelected is false
+                if (mSelected == false)
                 {
-                    currentSelected->setSelected(false);
+                    currentButtonSelected->setSelected(false);
                 }
                 // Set this.mSelected to true
                 mSelected = true;
+                // Set "this" as the current button selected
+                currentButtonSelected = this;
                 break;
 
             case SDL_MOUSEBUTTONUP:
@@ -86,7 +88,7 @@ void LButton::handleEvent(SDL_Event* E, LButton* currentSelected)
     }
 }
 
-bool LButton::isSelected()
+bool LButton::isSelected() const
 {
     return mSelected;
 }
@@ -133,12 +135,12 @@ void LButton::renderButton()
     SDL_RenderFillRect(dRenderer, &mButtonRect);
 }
 
-std::string LButton::getNumber()
+std::string LButton::getNumber() const
 {
     return mNumber;
 }
 
-void LButton::setNumber(std::string& inputNumber)
+void LButton::setNumber(const std::string& const inputNumber)
 {
     mNumber = inputNumber;
 }

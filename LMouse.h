@@ -9,14 +9,13 @@ enum class LButtonState
     BUTTON_MOUSE_OVER_MOTION = 1,
     BUTTON_MOUSE_DOWN = 2,
     BUTTON_MOUSE_UP = 3,
-    BUTTON_TOTAL = 4
 };
 
-// The mouse button
+// A mouse button class
 class LButton : public LTexture
 {
 private:
-    // Currently used global sprite
+    // Currently used state
     LButtonState mCurrentState;
 
     // Selected variable
@@ -30,19 +29,19 @@ private:
 
 public:
     // Initialises internal variables
-    LButton(SDL_Renderer* inputRenderer = nullptr);
+    LButton();
 
     // Set SDL_Rect
-    void setButtonRect(SDL_Rect& inputRect);
+    void setButtonRect(const SDL_Rect& const inputRect);
 
     // Get SDL_Rect
-    SDL_Rect getButtonRect();
+    SDL_Rect getButtonRect() const;
 
     // Handles mouse event
-    void handleEvent(SDL_Event* E, LButton* currentSelected);
+    void handleEvent(const SDL_Event* const E, LButton*& currentSelected);
 
     // Get selected variable
-    bool isSelected();
+    bool isSelected() const;
 
     // Set selected variable
     void setSelected(bool input);
@@ -51,9 +50,9 @@ public:
     void renderButton();
 
     // Get number
-    std::string getNumber();
+    std::string getNumber() const;
 
     // Set number
-    void setNumber(std::string& inputNumber);
+    void setNumber(const std::string& const inputNumber);
     
 };

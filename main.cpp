@@ -1,175 +1,157 @@
 /* Sudoku program */
 #include <SDL.h> 
-#include <SDL_image.h>
 #include <SDL_ttf.h>
+#include <stdlib.h>
 #include <iostream>
 #include <string>
-#include <vector>
 
 #include "SudokuInit.h"
-#include "SudokuGrid.h"
 #include "LTexture.h"
 #include "LMouse.h"
 
 // SDL Lazy Foo' Tutorials = https://lazyfoo.net/tutorials/SDL/index.php
 // SDL Documentation = https://wiki.libsdl.org/FrontPage
-// SDL Image Documentation = https://www.libsdl.org/projects/SDL_image/docs/index.html
 // SDL True Type Fonts = https://www.libsdl.org/projects/SDL_ttf/
 
-inline bool isInteger(const std::string& s)
-{	
-	// Returns true if s is an integer greater than 0
-	if (atoi(s.c_str())) return true;
+inline int getIndex(int row, int col, int gridRows)
+{
+	return row * gridRows + col;
+}
+
+inline bool isInteger(const char* s)
+{
+	// Returns true if s is an integer and greater than 0
+	if (atoi(s)) return true;
 	return false;
-}
-
-inline int getIndex(int row, int col)
-{
-	return row * 9 + col;
-}
-
-inline void getRenderCoordinates(int row, int col, int* posX, int* posY, int FontSize)
-{
-	*posX = (int)(FontSize * col + FontSize/5);
-	*posY = (int)(FontSize * row + FontSize/9);
 }
 
 int main(int argc, char* argv[])
 {
 	// Define window dimensions
-	constexpr int SCREEN_HEIGHT = 810;
-	constexpr int SCREEN_WIDTH = 810;
+	const int ScreenHeight = 810;
+	const int ScreenWidth = 810;
 
+	// Define Sudoku grid rows and columns (normally set to 9 x 9)
+	const int GridRows = 9;
+	const int GridCols = 9;
+	
 	// Initialise window and renderer
 	SDL_Window* Window = nullptr;
 	SDL_Renderer* Renderer = nullptr;
 
-	// Intialise font
+	// Intialise font for SDL true type fonts
 	TTF_Font* Font = nullptr;
-	int FontSize = SCREEN_HEIGHT/9;
+	int FontSize = ScreenHeight/GridRows;
 
 	// Initialise colours (RGBA)
-	SDL_Color ClearColour = { 255, 255, 255, SDL_ALPHA_OPAQUE };
-	SDL_Color GridColour = { 0, 0, 0, SDL_ALPHA_OPAQUE };
-	SDL_Color FontColour = { 0, 0, 0, SDL_ALPHA_OPAQUE };
+	SDL_Color ClearColour = { 0, 0, 0, SDL_ALPHA_OPAQUE }; // Black
+	SDL_Color GridColour = { 0, 0, 0, SDL_ALPHA_OPAQUE }; // Black
+	SDL_Color FontColour = { 0, 0, 0, SDL_ALPHA_OPAQUE }; // Black
 
-	// Initialise subsystems
-	if (!Init(Window, Renderer, Font, FontSize, SCREEN_WIDTH, SCREEN_HEIGHT))
+	// Initialise window, renderer and true type font
+	if (!Init(Window, Renderer, Font, FontSize, ScreenWidth, ScreenHeight))
 	{
+		// If initialisation failed, then close and return
 		Close(Window, Renderer, Font);
 		return 1;
 	}
 
-	// Creating Sudoku grid
-	SudokuGrid S_Grid(Renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+	// Create array of buttons
+	const int TotalButtons = GridRows * GridCols;
+	LButton Buttons[TotalButtons];
 
-	// Clear screen
-	SDL_SetRenderDrawColor(Renderer, ClearColour.r, ClearColour.g, ClearColour.b, ClearColour.a);
-	SDL_RenderClear(Renderer);
+	// Define Button dimensions
+	const int ButtonWidth = ScreenWidth / GridCols;
+	const int ButtonHeight = ScreenHeight / GridRows;
 
-	// Render
-	S_Grid.render(GridColour);
-	SDL_RenderPresent(Renderer);
+	// Create offsets for texture for number display to center it
+	const int WidthOffSet = FontSize / 5;
+	const int HeightOffSet = FontSize / 9;
 
-	// Create array of text inputs for numbers (9 x 9 = 81)
-	int TOTAL_BUTTONS = 81;
-	std::vector<LButton> InputNumberButtons;
-	int ButtonWidth = SCREEN_WIDTH / 9;
-	int ButtonHeight = SCREEN_HEIGHT / 9;
-	int WidthOffSet = FontSize / 5;
-	int HeightOffSet = FontSize / 9;
-	for (int row = 0; row < 9; row++)
+	// Initialise each button of the sudoku grid
+	for (int row = 0; row < GridRows; row++)
 	{
-		for (int col = 0; col < 9; col++)
+		for (int col = 0; col < GridCols; col++)
 		{
-			SDL_Rect ButtonRect = {col*ButtonWidth, row*ButtonHeight, ButtonWidth, ButtonHeight};
+			int currentIndex = getIndex(row, col, GridRows);
+			Buttons[currentIndex].setRenderer(Renderer);
+			SDL_Rect ButtonRect = {col*ButtonWidth+10, row*ButtonHeight+10, ButtonWidth-10, ButtonHeight-10};
 			SDL_Rect TextureRect = {col*ButtonWidth + WidthOffSet, row*ButtonHeight + HeightOffSet, NULL, NULL};
-			LButton InputButton(Renderer);
-			InputButton.setButtonRect(ButtonRect);
-			InputButton.setTextureRect(TextureRect);
-			InputNumberButtons.push_back(InputButton);
+			Buttons[currentIndex].setButtonRect(ButtonRect);
+			Buttons[currentIndex].setTextureRect(TextureRect);
 		}
 	}
 
 	// Enable text input
 	SDL_StartTextInput();
-	LButton Num(Renderer);
 
 	// Loop variables
-	LButton* currentButtonSelected = nullptr;
+	SDL_Event Event;
+	LButton* currentButtonSelected = &Buttons[0];
 	bool Stop = false;
-	SDL_Event E;
+	bool UpdateTexture = false;
+	std::string StringNum = "";
 
 	while (!Stop)
 	{
-
-		// Rerender text
-		bool RenderText = false;
+		// Update text
+		UpdateTexture = false;
 
 		/// Handle events on queue
-		while (SDL_PollEvent(&E) != 0)
+		while (SDL_PollEvent(&Event) != 0)
 		{
-			// User requests quit
-			if (E.type == SDL_QUIT)
+			// Handle quiting
+			if (Event.type == SDL_QUIT)
 			{
 				Stop = true;
 			}
-			// Handle button events
-			for (int i = 0; i < TOTAL_BUTTONS; i++)
+			// Handle button events from mouse
+			for (int i = 0; i < TotalButtons; i++)
 			{
-				// Check if button is selected
-				InputNumberButtons[i].handleEvent(&E, currentButtonSelected);
-				if (InputNumberButtons[i].isSelected())
-				{
-					currentButtonSelected = &InputNumberButtons[i];
-				}
-
+				// Change the current button selected if a different button has been selected
+				Buttons[i].handleEvent(&Event, currentButtonSelected);
 			}
-			if (currentButtonSelected != nullptr)
+			// Handle key inputs
+			StringNum = currentButtonSelected->getNumber();
+			// Special key input
+			if (Event.type == SDL_KEYDOWN)
 			{
-				std::string StringNum = currentButtonSelected->getNumber();
-				// Special key input
-				if (E.type == SDL_KEYDOWN)
+				// Handle backspace
+				if (Event.key.keysym.sym == SDLK_BACKSPACE && StringNum.length() > 0)
 				{
-					// Handle backspace
-					if (E.key.keysym.sym == SDLK_BACKSPACE && StringNum.length() > 0)
-					{
-						// Pop off character
-						StringNum.pop_back();
-						currentButtonSelected->setNumber(StringNum);
-						RenderText = true;
-					}
+					// Pop off character
+					StringNum.pop_back();
+					currentButtonSelected->setNumber(StringNum);
+					UpdateTexture = true;
 				}
-				// Special text input event
-				else if (E.type == SDL_TEXTINPUT)
+			}
+			// Special text input event
+			else if (Event.type == SDL_TEXTINPUT)
+			{
+				// Check if length is less than 1 and is a number
+				if (isInteger(Event.text.text) && StringNum.length() < 1)
 				{
-					// Check if length is less than 1 and is a number
-					if (isInteger(E.text.text) && StringNum.length() < 1)
-					{
-						// Append character
-						StringNum += E.text.text;
-						currentButtonSelected->setNumber(StringNum);
-						RenderText = true;
-					}
+					// Append character
+					StringNum += Event.text.text;
+					currentButtonSelected->setNumber(StringNum);
+					UpdateTexture = true;
 				}
 			}
 		}
-
-		// Render each button text texture
-		for (int i = 0; i < TOTAL_BUTTONS; i++)
+		// Update texture if key pressed
+		if (UpdateTexture)
 		{
-			std::string StringNum = InputNumberButtons[i].getNumber();
 			// Text is not empty
 			if (StringNum != "")
 			{
 				// Render new text
-				InputNumberButtons[i].loadFromRenderedText(StringNum, FontColour, Font);
+				currentButtonSelected->loadFromRenderedText(StringNum, FontColour, Font);
 			}
 			// Text is empty
 			else
 			{
-				// Render space texture
-				InputNumberButtons[i].loadFromRenderedText(" ", FontColour, Font);
+				// Render an empty space texture
+				currentButtonSelected->loadFromRenderedText(" ", FontColour, Font);
 			}
 		}
 
@@ -177,27 +159,24 @@ int main(int argc, char* argv[])
 		SDL_SetRenderDrawColor(Renderer, ClearColour.r, ClearColour.g, ClearColour.b, ClearColour.a);
 		SDL_RenderClear(Renderer);
 
-		// Render buttons and texture
-		for (int i = 0; i < TOTAL_BUTTONS; ++i)
+		// Render buttons and texture to backbuffer
+		for (int i = 0; i < TotalButtons; i++)
 		{
-			InputNumberButtons[i].renderButton();
-			InputNumberButtons[i].renderTexture();
+			Buttons[i].renderButton();
+			Buttons[i].renderTexture();
 		}
 
-		// Render grid
-		S_Grid.render(GridColour);
-
-		// Update screen
+		// Update screen from backbuffer and clear backbuffer
 		SDL_RenderPresent(Renderer);
 	}
 
 	// Disable text input
 	SDL_StopTextInput();
 
-	// Free input button textures
-	for (int i = 0; i < TOTAL_BUTTONS; ++i)
+	// Free button textures
+	for (int i = 0; i < TotalButtons; ++i)
 	{
-		InputNumberButtons[i].free();
+		Buttons[i].free();
 	}
 
 	// Destroy and quit
