@@ -21,10 +21,13 @@
     <ClCompile Include="SudokuGrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Text.cpp">
+    <ClCompile Include="LTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ImageLoad.cpp">
+    <ClCompile Include="SudokuInit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LMouse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,16 +35,19 @@
     <ClInclude Include="SudokuGrid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Text.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CleanUp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ImageLoadcpp.h">
+    <ClInclude Include="ResourcePath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ResourcePath.h">
+    <ClInclude Include="LTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SudokuInit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LMouse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

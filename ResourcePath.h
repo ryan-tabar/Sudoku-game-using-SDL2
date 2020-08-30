@@ -4,7 +4,7 @@
 #include <string>
 #include <SDL.h>
 
-/* Get the resource path for resources located in res/subDir */
+/* Get the resource path for resources located in Resources/subDir */
 std::string getResourcePath(const std::string& subDir = "")
 {
 	// We need to choose the path seperator properly base on which
@@ -15,7 +15,7 @@ std::string getResourcePath(const std::string& subDir = "")
 #else
 	const char PATH_SEP = '/';
 #endif
-	// This will hold the base resource path: res/Lesson1/
+	// This will hold the base resource path
 	// We give it static lifetime so that we'll only need to call
 	// SDL_GetBasePath once to get the executable path
 	static std::string baseRes;
@@ -33,7 +33,7 @@ std::string getResourcePath(const std::string& subDir = "")
 			std::cerr << "Error getting resource path: " << SDL_GetError() << std::endl;
 			return "";
 		}
-		baseRes = baseRes + ".." + PATH_SEP + "res" + PATH_SEP;
+		baseRes = baseRes + ".." + PATH_SEP + "Resources" + PATH_SEP;
 	}
 	return subDir.empty() ? baseRes : baseRes + subDir + PATH_SEP;
 }

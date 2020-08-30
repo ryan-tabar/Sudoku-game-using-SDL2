@@ -10,10 +10,8 @@ private:
 
 public:
 	SudokuGrid(SDL_Renderer* inputRenderer = NULL, int inputWidth = 100, int inputHeight = 100);
-	void ClearRenderer(SDL_Color& ClearColour);
-	void DrawVerticalLines();
-	void DrawHorizontalLines();
-	void DrawGrid(SDL_Color& GridColour);
-	void UpdateGrid();
+	void renderVerticalLines();
+	void renderHorizontalLines();
+	void render(SDL_Color& GridColour);
 
 };
