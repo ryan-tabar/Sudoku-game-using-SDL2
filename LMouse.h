@@ -27,6 +27,15 @@ private:
     // Number to be displayed
     std::string mNumber;
 
+    // Default mouse colours if not editable
+    SDL_Color MouseOutColour = { 159, 101, 152, SDL_ALPHA_OPAQUE }; // purple
+    SDL_Color MouseOverMotionColour = { 159, 101, 152, SDL_ALPHA_OPAQUE }; // purple
+    SDL_Color MouseDownColour = { 159, 101, 152, SDL_ALPHA_OPAQUE }; // purple
+    SDL_Color MouseUpColour = { 159, 101, 152, SDL_ALPHA_OPAQUE }; // purple
+
+    // Uneditable button
+    bool mEditable;
+
 public:
     // Initialises internal variables
     LButton();
@@ -36,6 +45,12 @@ public:
 
     // Get SDL_Rect
     SDL_Rect getButtonRect() const;
+
+    // Set Editability
+    void setEditable(const bool input);
+
+    // Get Editability
+    bool getEditable();
 
     // Handles mouse event
     void handleEvent(const SDL_Event* const E, LButton*& currentSelected);

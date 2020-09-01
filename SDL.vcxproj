@@ -153,14 +153,18 @@
     <ClCompile Include="LMouse.cpp" />
     <ClCompile Include="LTexture.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="SudokuGenerator.cpp" />
     <ClCompile Include="SudokuInit.cpp" />
+    <ClCompile Include="SudokuSolver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CleanUp.h" />
     <ClInclude Include="LMouse.h" />
     <ClInclude Include="LTexture.h" />
     <ClInclude Include="ResourcePath.h" />
+    <ClInclude Include="SudokuGenerator.h" />
     <ClInclude Include="SudokuInit.h" />
+    <ClInclude Include="SudokuSolver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

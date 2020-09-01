@@ -1,4 +1,4 @@
-/* Sudoku program */
+/* Sudoku generator and solver */
 #include <SDL.h> 
 #include <SDL_ttf.h>
 #include <stdlib.h>
@@ -8,6 +8,8 @@
 #include "SudokuInit.h"
 #include "LTexture.h"
 #include "LMouse.h"
+#include "SudokuGenerator.h"
+#include "SudokuSolver.h"
 
 // SDL Lazy Foo' Tutorials = https://lazyfoo.net/tutorials/SDL/index.php
 // SDL Documentation = https://wiki.libsdl.org/FrontPage
@@ -28,6 +30,10 @@ inline bool isInteger(const char* s)
 int main(int argc, char* argv[])
 {
 	// Define window dimensions
+	const int WindowHeight = 900;
+	const int WindowWidth = 810;
+
+	// Define Sudoku screen dimensions
 	const int ScreenHeight = 810;
 	const int ScreenWidth = 810;
 
@@ -43,18 +49,25 @@ int main(int argc, char* argv[])
 	TTF_Font* Font = nullptr;
 	int FontSize = ScreenHeight/GridRows;
 
-	// Initialise colours (RGBA)
-	SDL_Color ClearColour = { 0, 0, 0, SDL_ALPHA_OPAQUE }; // Black
-	SDL_Color GridColour = { 0, 0, 0, SDL_ALPHA_OPAQUE }; // Black
-	SDL_Color FontColour = { 0, 0, 0, SDL_ALPHA_OPAQUE }; // Black
-
-	// Initialise window, renderer and true type font
-	if (!Init(Window, Renderer, Font, FontSize, ScreenWidth, ScreenHeight))
+	// Initialise SDL window, renderer and true type font
+	if (!Init(Window, Renderer, Font, FontSize, WindowWidth, WindowHeight))
 	{
 		// If initialisation failed, then close and return
 		Close(Window, Renderer, Font);
 		return 1;
 	}
+
+	// Initialise colours (RGBA)
+	SDL_Color ClearColour = { 0, 0, 0, SDL_ALPHA_OPAQUE }; // Black
+	SDL_Color GridColour = { 0, 0, 0, SDL_ALPHA_OPAQUE }; // Black
+	SDL_Color FontColour = { 0, 0, 0, SDL_ALPHA_OPAQUE }; // Black
+	SDL_Color FixedButtonColour = { 159, 101, 152, SDL_ALPHA_OPAQUE }; // purple
+
+	// Generate Unique Sudoku array
+	int generatedSudoku[GridRows * GridCols];
+	SudokuGenerator SG;
+	SG.setSudoku(generatedSudoku);
+	SG.generateSudoku();
 
 	// Create array of buttons
 	const int TotalButtons = GridRows * GridCols;
@@ -64,54 +77,103 @@ int main(int argc, char* argv[])
 	const int ButtonWidth = ScreenWidth / GridCols;
 	const int ButtonHeight = ScreenHeight / GridRows;
 
-	// Create offsets for texture for number display to center it
-	const int WidthOffSet = FontSize / 5;
-	const int HeightOffSet = FontSize / 9;
+	// Create offsets for grid display
+	const float BorderFactor = 0.01;
+	const float ThinBorderFactor = 0.5;
+	const float ButtonStartOffSetFactor = 0.33;
+	int ButtonStartWidthOffSet;
+	int ButtonStartHeightOffSet;
+	int ButtonWidthOffSet;
+	int ButtonHeightOffSet;
+	const int TextureWidthOffSet = FontSize / 5;
+	const int TextureHeightOffSet = FontSize / 10;
 
-	// Initialise each button of the sudoku grid
+	// Initialise button size and placement on the Sudoku grid.
 	for (int row = 0; row < GridRows; row++)
 	{
 		for (int col = 0; col < GridCols; col++)
 		{
 			int currentIndex = getIndex(row, col, GridRows);
 			Buttons[currentIndex].setRenderer(Renderer);
-			SDL_Rect ButtonRect = {col*ButtonWidth+10, row*ButtonHeight+10, ButtonWidth-10, ButtonHeight-10};
-			SDL_Rect TextureRect = {col*ButtonWidth + WidthOffSet, row*ButtonHeight + HeightOffSet, NULL, NULL};
-			Buttons[currentIndex].setButtonRect(ButtonRect);
-			Buttons[currentIndex].setTextureRect(TextureRect);
+
+			// If statements for thicker borders on each 3 x 3 block
+			if ((col + 1) % 3 == 0 && (col + 1) != GridCols) ButtonWidthOffSet = BorderFactor * ScreenWidth;
+			else ButtonWidthOffSet = BorderFactor * ScreenWidth * ThinBorderFactor;
+
+			if ((row + 1) % 3 == 0 && (row + 1) != GridRows) ButtonHeightOffSet = BorderFactor * ScreenHeight;
+			else ButtonHeightOffSet = BorderFactor * ScreenHeight * ThinBorderFactor;
+
+			ButtonStartWidthOffSet = ButtonWidthOffSet * ButtonStartOffSetFactor;
+			ButtonStartHeightOffSet = ButtonWidthOffSet * ButtonStartOffSetFactor;
+
+			Buttons[currentIndex].setButtonRect({ col * ButtonWidth + ButtonStartWidthOffSet, row * ButtonHeight + ButtonStartHeightOffSet, ButtonWidth - ButtonWidthOffSet, ButtonHeight - ButtonHeightOffSet });
+			Buttons[currentIndex].setTextureRect({ col * ButtonWidth + TextureWidthOffSet, row * ButtonHeight + TextureHeightOffSet, NULL, NULL });
+
+			std::string StringNum = std::to_string(SG.getElement(row, col));
+			if (StringNum == "0")
+			{
+				StringNum = " ";
+				Buttons[currentIndex].setEditable(true);
+			}
+			Buttons[currentIndex].setNumber(StringNum);
+			Buttons[currentIndex].loadFromRenderedText(StringNum, FontColour, Font);
+
 		}
 	}
+
+	// Solve Sudoku
+	int solvedSudoku[GridRows * GridCols];
+	SudokuSolver SS;
+	SS.setSudoku(generatedSudoku);
+	SS.solveSudoku();
+	SS.displaySudoku();
 
 	// Enable text input
 	SDL_StartTextInput();
 
+	// Set first current button selected
+	LButton* currentButtonSelected = nullptr;
+	for (int i = 0; i < TotalButtons; i++)
+	{
+		if (Buttons[i].getEditable())
+		{
+			currentButtonSelected = &Buttons[i];
+			Buttons[i].setSelected(true);
+			break;
+		}
+	}
+
 	// Loop variables
 	SDL_Event Event;
-	LButton* currentButtonSelected = &Buttons[0];
 	bool Stop = false;
 	bool UpdateTexture = false;
 	std::string StringNum = "";
+	bool Completed = false;
 
 	while (!Stop)
 	{
-		// Update text
+		// Update texture flag
 		UpdateTexture = false;
 
-		/// Handle events on queue
+		// Handle events on queue
 		while (SDL_PollEvent(&Event) != 0)
 		{
 			// Handle quiting
-			if (Event.type == SDL_QUIT)
+			if (Event.type == SDL_QUIT || Completed == true)
 			{
 				Stop = true;
 			}
 			// Handle button events from mouse
 			for (int i = 0; i < TotalButtons; i++)
 			{
-				// Change the current button selected if a different button has been selected
-				Buttons[i].handleEvent(&Event, currentButtonSelected);
+				// If editable
+				if (Buttons[i].getEditable())
+				{
+					// Change the current button selected if a different button has been selected
+					Buttons[i].handleEvent(&Event, currentButtonSelected);
+				}
 			}
-			// Handle key inputs
+			// Grab current number from selected button for checking
 			StringNum = currentButtonSelected->getNumber();
 			// Special key input
 			if (Event.type == SDL_KEYDOWN)
@@ -129,10 +191,10 @@ int main(int argc, char* argv[])
 			else if (Event.type == SDL_TEXTINPUT)
 			{
 				// Check if length is less than 1 and is a number
-				if (isInteger(Event.text.text) && StringNum.length() < 1)
+				if (isInteger(Event.text.text) && StringNum.length() < 2)
 				{
-					// Append character
-					StringNum += Event.text.text;
+					// Assign/replace character
+					StringNum = Event.text.text;
 					currentButtonSelected->setNumber(StringNum);
 					UpdateTexture = true;
 				}
@@ -155,6 +217,17 @@ int main(int argc, char* argv[])
 			}
 		}
 
+		// Check if complete
+		for (int i = 0; i < TotalButtons; i++)
+		{
+			if (atoi(Buttons[i].getNumber().c_str()) != generatedSudoku[i])
+			{
+				Completed = false;
+				break;
+			}
+			Completed = true;
+		}
+
 		// Clear screen
 		SDL_SetRenderDrawColor(Renderer, ClearColour.r, ClearColour.g, ClearColour.b, ClearColour.a);
 		SDL_RenderClear(Renderer);
@@ -168,10 +241,23 @@ int main(int argc, char* argv[])
 
 		// Update screen from backbuffer and clear backbuffer
 		SDL_RenderPresent(Renderer);
+
+		// Slow down program becuase it does not need to run very fast
+		SDL_Delay(10);
 	}
 
 	// Disable text input
 	SDL_StopTextInput();
+
+	// Display whether they completed successfully or closed before completing
+	if (Completed)
+	{
+		std::cout << "Congratulations! You successfully completed the Sudoku puzzle!" << std::endl;
+	}
+	else
+	{
+		std::cout << "Oh no! You closed before completing the Sudoku puzzle!" << std::endl;
+	}
 
 	// Free button textures
 	for (int i = 0; i < TotalButtons; ++i)

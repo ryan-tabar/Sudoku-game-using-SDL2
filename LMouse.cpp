@@ -1,7 +1,8 @@
 #include "LMouse.h"
 
 LButton::LButton()
-	:mCurrentState(LButtonState::BUTTON_MOUSE_OUT), mButtonRect({ 0, 0, 0, 0 }), mSelected(false), mNumber("")
+	:mCurrentState(LButtonState::BUTTON_MOUSE_OUT), mButtonRect({ 0, 0, 0, 0 }), 
+    mSelected(false), mNumber(""), mEditable(false)
 {
 
 }
@@ -16,6 +17,30 @@ SDL_Rect LButton::getButtonRect() const
     return mButtonRect;
 }
 
+void LButton::setEditable(const bool input)
+{
+    mEditable = input;
+    if (mEditable)
+    {
+        MouseOutColour = { 219, 184, 215, SDL_ALPHA_OPAQUE }; // light purple
+        MouseOverMotionColour = { 95, 89, 191, SDL_ALPHA_OPAQUE }; // blue
+        MouseDownColour = { 91, 191, 116, SDL_ALPHA_OPAQUE }; // green
+        MouseUpColour = { 95, 89, 191, SDL_ALPHA_OPAQUE }; // blue
+    }
+    else
+    {
+        MouseOutColour = { 159, 101, 152, SDL_ALPHA_OPAQUE }; // purple
+        MouseOverMotionColour = { 159, 101, 152, SDL_ALPHA_OPAQUE }; // purple
+        MouseDownColour = { 159, 101, 152, SDL_ALPHA_OPAQUE }; // purple
+        MouseUpColour = { 159, 101, 152, SDL_ALPHA_OPAQUE }; // purple
+    }
+}
+
+bool LButton::getEditable()
+{
+    return mEditable;
+}
+
 void LButton::handleEvent(const SDL_Event* const Event, LButton*& currentButtonSelected)
 {
     //If mouse event happened
@@ -24,8 +49,6 @@ void LButton::handleEvent(const SDL_Event* const Event, LButton*& currentButtonS
         // Get mouse position
         int x, y;
         SDL_GetMouseState(&x, &y);
-
-        // Get SDL_Rect from inherited class LTexture
 
         // Check if mouse is in button
         bool inside = true;
@@ -101,10 +124,6 @@ void LButton::setSelected(bool input)
 void LButton::renderButton()
 {
     // Initialise colours (RGBA)
-    SDL_Color MouseOutColour = { 255, 255, 255, SDL_ALPHA_OPAQUE };
-    SDL_Color MouseOverMotionColour = { 255, 0, 0, SDL_ALPHA_OPAQUE };
-    SDL_Color MouseDownColour = { 0, 255, 0, SDL_ALPHA_OPAQUE };
-    SDL_Color MouseUpColour = { 255, 0, 0, SDL_ALPHA_OPAQUE };
     SDL_Renderer* dRenderer = getRenderer();
 
     // If current button is selected
