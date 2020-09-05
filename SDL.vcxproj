@@ -150,19 +150,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Sudoku.cpp" />
     <ClCompile Include="SudokuCell.cpp" />
     <ClCompile Include="SudokuGenerator.cpp" />
     <ClCompile Include="SudokuSolver.cpp" />
+    <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Button.h" />
     <ClInclude Include="CleanUp.h" />
     <ClInclude Include="ResourcePath.h" />
     <ClInclude Include="Sudoku.h" />
     <ClInclude Include="SudokuCell.h" />
     <ClInclude Include="SudokuGenerator.h" />
     <ClInclude Include="SudokuSolver.h" />
+    <ClInclude Include="Texture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

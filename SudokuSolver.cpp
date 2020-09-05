@@ -1,23 +1,23 @@
 #include "SudokuSolver.h"
 
-SudokuSolver::SudokuSolver()
-	: mSudokuArray(nullptr), mGenModifier(false), mNumToIgnore({ 0, 0, 0 })
+Sudoku::Solver::Solver()
+	: mGrid(nullptr), mGenModifier(false), mNumToIgnore({ 0, 0, 0 })
 {
 
 }
 
 //--------------------------------------Private methods----------------------------------------//
-inline void SudokuSolver::setElement(const int row, const int col, const int num)
+inline void Sudoku::Solver::setElement(const int row, const int col, const int num)
 {
-	mSudokuArray[row * 9 + col] = num;
+	mGrid[row * 9 + col] = num;
 }
 
-inline int SudokuSolver::getElement(const int row, const int col) const
+inline int Sudoku::Solver::getElement(const int row, const int col) const
 {
-	return mSudokuArray[row * 9 + col];
+	return mGrid[row * 9 + col];
 }
 
-bool SudokuSolver::checkValid(const int inputRow, const int inputCol, const int num) const
+bool Sudoku::Solver::checkValid(const int inputRow, const int inputCol, const int num) const
 {
 	// if number is valid i.e. not found in row, col, or block then return true
 
@@ -62,18 +62,18 @@ bool SudokuSolver::checkValid(const int inputRow, const int inputCol, const int 
 }
 
 //--------------------------------------Public methods----------------------------------------//
-void SudokuSolver::setGenModifier(const bool input)
+void Sudoku::Solver::setGenModifier(const bool input)
 {
 	mGenModifier = input;
 }
 
-void SudokuSolver::setSudoku(int* inputArray, const Ignore& ignoreInput)
+void Sudoku::Solver::setGrid(int* grid, const Ignore& ignoreInput)
 {
 	mNumToIgnore = ignoreInput;
-	mSudokuArray = inputArray;
+	mGrid = grid;
 }
 
-bool SudokuSolver::solveSudoku()
+bool Sudoku::Solver::solve()
 {
 	for (int row = 0; row < 9; row++)
 	{
@@ -91,7 +91,7 @@ bool SudokuSolver::solveSudoku()
 						{
 							setElement(row, col, num);
 
-							if (solveSudoku())
+							if (solve())
 							{
 								return true;
 							}
@@ -109,13 +109,13 @@ bool SudokuSolver::solveSudoku()
 	return true;
 }
 
-void SudokuSolver::displaySudoku() const
+void Sudoku::Solver::display() const
 {
 	for (int row = 0; row < 9; row++)
 	{
 		for (int col = 0; col < 9; col++)
 		{
-			std::cout << mSudokuArray[row * 9 + col] << ", ";
+			std::cout << mGrid[row * 9 + col] << ", ";
 		}
 		std::cout << std::endl;
 	}

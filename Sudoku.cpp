@@ -1,8 +1,8 @@
 #include "Sudoku.h"
 
 //----------------------------------Constructor and Destructor---------------------------------//
-Sudoku::Sudoku()
-	: mWindowHeight(810), mWindowWidth(810),
+Sudoku::Game::Game()
+	: mWindowHeight(900), mWindowWidth(810),
 	  mGridHeight(810), mGridWidth(810),
 	  mGridRows(9), mGridCols(9),
 	  mTotalCells(81),
@@ -12,14 +12,14 @@ Sudoku::Sudoku()
 
 }
 
-Sudoku::~Sudoku()
+Sudoku::Game::~Game()
 {
 	freeTextures();
 	close();
 }
 
 //--------------------------------------Private methods----------------------------------------//
-bool Sudoku::initialiseSDL()
+bool Sudoku::Game::initialiseSDL()
 {
 	// Set success initialisation flag
 	bool success = true;
@@ -65,27 +65,26 @@ bool Sudoku::initialiseSDL()
 	return success;
 }
 
-inline int Sudoku::getIndex(int row, int col) const
+inline int Sudoku::Game::getIndex(int row, int col) const
 {
 	return row * mGridRows + col;
 }
 
-void Sudoku::generateSudoku()
+void Sudoku::Game::generateSudoku()
 {
 	int SudokuGrid[81] = { };
 	int solution[81] = { };
-	SudokuGenerator SG;
-	SG.generateSudoku(SudokuGrid, solution);
+	Generator G;
+	G.generate(SudokuGrid, solution);
 	for (int i = 0; i < 81; i++)
 	{
 		// Set number and solution
-		mSudokuGrid[i].setNumber(SudokuGrid[i]);
-		mSudokuGrid[i].setSolution(solution[i]); 
+		mGrid[i].setNumber(SudokuGrid[i]);
+		mGrid[i].setSolution(solution[i]); 
 	}
 }
 
-// Set cell button and texture paramaters based on generated Sudoku
-void Sudoku::setCells()
+void Sudoku::Game::setCells()
 {
 	// Define Button dimensions
 	const int buttonWidth = mGridWidth / mGridCols;
@@ -109,7 +108,6 @@ void Sudoku::setCells()
 		{
 			// Get index and bind renderer
 			int index = getIndex(row, col);
-			mSudokuGrid[index].setRenderer(mRenderer);
 
 			// Set button width offsets base on thickness of borders
 			if ((col + 1) % 3 == 0 && (col + 1) != mGridCols) buttonWidthOffSet = borderFactor * mGridWidth;
@@ -124,29 +122,30 @@ void Sudoku::setCells()
 			buttonStartHeightOffSet = buttonWidthOffSet * buttonStartOffSetFactor;
 
 			// Set button and texture positions and dimensions
-			mSudokuGrid[index].setButtonRect({ col * buttonWidth + buttonStartWidthOffSet, row * buttonHeight + buttonStartHeightOffSet, buttonWidth - buttonWidthOffSet, buttonHeight - buttonHeightOffSet });
-			mSudokuGrid[index].setTextureRect({ col * buttonWidth + textureWidthOffSet, row * buttonHeight + textureHeightOffSet, NULL, NULL });
+			mGrid[index].setButtonRect({ col * buttonWidth + buttonStartWidthOffSet, row * buttonHeight + buttonStartHeightOffSet, buttonWidth - buttonWidthOffSet, buttonHeight - buttonHeightOffSet });
+			mGrid[index].setTextureRect({ col * buttonWidth + textureWidthOffSet, row * buttonHeight + textureHeightOffSet, NULL, NULL });
 
-			// Set font
-			mSudokuGrid[index].setFont(mFont);
+			// Get character
+			char charNumber = mGrid[index].getNumber();
+
 			// load texture
-			mSudokuGrid[index].loadFontTexture();
+			mGrid[index].loadFontTexture(mRenderer, mFont, charNumber);
 		}
 	}
 
 
 }
 
-void Sudoku::freeTextures()
+void Sudoku::Game::freeTextures()
 {
 	for (int cell = 0; cell < mTotalCells; cell++)
 	{
-		mSudokuGrid[cell].freeTexture();
+		mGrid[cell].freeTexture();
 	}
 }
 
 //--------------------------------------Public methods----------------------------------------//
-void Sudoku::play()
+void Sudoku::Game::play()
 {
 	// Initialise SDL
 	if (!initialiseSDL())
@@ -164,12 +163,12 @@ void Sudoku::play()
 	SDL_StartTextInput();
 
 	// Set first current button selected
-	SudokuCell* currentCellSelected = &mSudokuGrid[0];
+	Cell* currentCellSelected = &mGrid[0];
 	for (int cell = 0; cell < mTotalCells; cell++)
 	{
-		if (mSudokuGrid[cell].isEditable())
+		if (mGrid[cell].isEditable())
 		{
-			currentCellSelected = &mSudokuGrid[cell];
+			currentCellSelected = &mGrid[cell];
 			currentCellSelected->setSelected(true);
 			break;
 		}
@@ -194,20 +193,20 @@ void Sudoku::play()
 			for (int cell = 0; cell < mTotalCells; cell++)
 			{
 				// If editable
-				if (mSudokuGrid[cell].isEditable())
+				if (mGrid[cell].isEditable())
 				{
 					// Change the current cell selected if a different button has been selected
-					mSudokuGrid[cell].handleMouseEvent(&event, currentCellSelected);
+					mGrid[cell].handleMouseEvent(&event, (Button*&)currentCellSelected);
 				}
 			}
-			// Handle keyboard events
-			currentCellSelected->handleKeyboardEvent(&event);
+			// Handle keyboard events for current cell
+			currentCellSelected->handleKeyboardEvent(&event, mRenderer, mFont);
 		}
 
 		// Check if complete
 		for (int cell = 0; cell < mTotalCells; cell++)
 		{
-			if (!mSudokuGrid[cell].isCorrect())
+			if (!mGrid[cell].isCorrect())
 			{
 				completed = false;
 				break;
@@ -222,8 +221,8 @@ void Sudoku::play()
 		// Render buttons and texture of each cell to backbuffer
 		for (int cell = 0; cell < mTotalCells; cell++)
 		{
-			mSudokuGrid[cell].renderButton();
-			mSudokuGrid[cell].renderTexture();
+			mGrid[cell].renderButton(mRenderer);
+			mGrid[cell].renderTexture(mRenderer);
 		}
 
 		// Update screen from backbuffer and clear backbuffer
@@ -253,7 +252,7 @@ void Sudoku::play()
 	close();
 }
 
-void Sudoku::close()
+void Sudoku::Game::close()
 {
 	// Destroy
 	SDL_DestroyRenderer(mRenderer);
