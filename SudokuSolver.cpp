@@ -1,15 +1,9 @@
 #include "SudokuSolver.h"
 
 SudokuSolver::SudokuSolver()
-	: mSudokuArray(nullptr), mSolutions(0), mFirstSolutionOnly(true),
-	mIsUnique(Unique::Yes), mGenModifier(false), mNumToIgnore({ 0, 0, 0 })
+	: mSudokuArray(nullptr), mGenModifier(false), mNumToIgnore({ 0, 0, 0 })
 {
 
-}
-
-SudokuSolver::~SudokuSolver()
-{
-	deleteAllSolutions();
 }
 
 //--------------------------------------Private methods----------------------------------------//
@@ -18,7 +12,12 @@ inline void SudokuSolver::setElement(const int row, const int col, const int num
 	mSudokuArray[row * 9 + col] = num;
 }
 
-bool SudokuSolver::checkValid(const int inputRow, const int inputCol, const int num)
+inline int SudokuSolver::getElement(const int row, const int col) const
+{
+	return mSudokuArray[row * 9 + col];
+}
+
+bool SudokuSolver::checkValid(const int inputRow, const int inputCol, const int num) const
 {
 	// if number is valid i.e. not found in row, col, or block then return true
 
@@ -62,79 +61,16 @@ bool SudokuSolver::checkValid(const int inputRow, const int inputCol, const int 
 	return true;
 }
 
-void SudokuSolver::clearSudoku()
-{
-	mSolutions = 0;
-	mIsUnique = Unique::Yes;
-	for (int i = 0; i < 81; i++)
-	{
-		mSudokuArray[i] = 0;
-	}
-	deleteAllSolutions();
-}
-
-void SudokuSolver::addArray()
-{
-	int* solutionArray = new int[81];
-	// delete[] solutionArray
-	for (int i = 0; i < 81; i++)
-	{
-		solutionArray[i] = mSudokuArray[i];
-	}
-
-	mAllSolutions.push_back(solutionArray);
-}
-
-void SudokuSolver::deleteAllSolutions()
-{
-	// Delete all solutions
-	for (const int* solution : mAllSolutions)
-	{
-		delete[] solution;
-	}
-
-	// Empty vector of int pointers
-	mAllSolutions.clear();
-}
-
 //--------------------------------------Public methods----------------------------------------//
-void SudokuSolver::setSudoku(int* inputArray)
-{
-	mSolutions = 0;
-	// Assume there is a unique solution
-	mIsUnique = Unique::Yes;
-	mSudokuArray = inputArray;
-	deleteAllSolutions();
-}
-
 void SudokuSolver::setGenModifier(const bool input)
 {
 	mGenModifier = input;
 }
 
-void SudokuSolver::setSudoku(int* inputArray, const Ignore& input)
+void SudokuSolver::setSudoku(int* inputArray, const Ignore& ignoreInput)
 {
-	// Ignore the choosing input number when that number is selected at the row and col
-	mNumToIgnore = input;
-	mSolutions = 0;
-	// Assume there is a unique solution
-	mIsUnique = Unique::Yes;
+	mNumToIgnore = ignoreInput;
 	mSudokuArray = inputArray;
-}
-
-void SudokuSolver::setFirstSolutionOnly(const bool input)
-{
-	mFirstSolutionOnly = input;
-}
-
-Unique SudokuSolver::isUniqueSolution() const
-{
-	return mIsUnique;
-}
-
-inline int SudokuSolver::getElement(const int row, const int col)
-{
-	return mSudokuArray[row * 9 + col];
 }
 
 bool SudokuSolver::solveSudoku()
@@ -169,46 +105,19 @@ bool SudokuSolver::solveSudoku()
 			}
 		}
 	}
-	// Increment number of solutions
-	mSolutions++;
-
-	// Add solution to vector of solutions
-	addArray();
-
-	// No unique solution found if number of solutions is greater than 1
-	if (mSolutions > 1)
-	{
-		mIsUnique = Unique::No;
-	}
-
-	// If only the first solution should be found
-	if (mFirstSolutionOnly)
-	{
-		// Solver complete
-		mIsUnique = Unique::Unknown;
-		return true;
-	}
-	// Else find all solutions
-	else
-	{
-		// Solver not complete until all solutions found
-		return false;
-	}
+	// Solution found
+	return true;
 }
 
-void SudokuSolver::displaySudoku()
+void SudokuSolver::displaySudoku() const
 {
-	for (const int* solution : mAllSolutions)
+	for (int row = 0; row < 9; row++)
 	{
-		for (int row = 0; row < 9; row++)
+		for (int col = 0; col < 9; col++)
 		{
-			for (int col = 0; col < 9; col++)
-			{
-				std::cout << solution[row * 9 + col] << ", ";
-			}
-			std::cout << std::endl;
+			std::cout << mSudokuArray[row * 9 + col] << ", ";
 		}
-		std::cout << "----------------------------\n";
+		std::cout << std::endl;
 	}
-
+	std::cout << "----------------------------\n";
 }

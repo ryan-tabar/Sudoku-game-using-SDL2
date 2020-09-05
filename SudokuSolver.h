@@ -1,17 +1,8 @@
 /* Sudoku solver class */
 #pragma once
 #include <iostream>
-#include <vector>
 
-// Enumeration for defining Sudoku solution(s)
-enum class Unique
-{
-	No = 0,
-	Yes = 1,
-	Unknown = 2,
-};
-
-// Struct for ignoring a number at certain coordinates (for generating Sudoku class)
+// Struct for ignoring a number specified at row and col (for the Sudoku generating class)
 struct Ignore
 {
 	int num = 0;
@@ -23,71 +14,35 @@ struct Ignore
 class SudokuSolver
 {
 private:
-	// Pointer to the Sudoku 1D array
+	// Pointer to the Sudoku 1D array and must be of size 9 x 9 = 81
 	int* mSudokuArray;
 
-	// Set element of 1D array using row and col
-	inline void setElement(const int row, const int col, const int num);
-
-	// Check if element is valid for its row, col, and the block of 3 x 3 its in
-	bool checkValid(const int inputRow, const int inputCol, const int num);
-
-	// Clear Sudoku array
-	void clearSudoku();
-
-	// Track number of solutions
-	int mSolutions;
-
-	// Find first solution only
-	bool mFirstSolutionOnly;
-
-	// Check if there is a unique solution
-	Unique mIsUnique;
-
-	// A modifier flag (for the generating Sudoku class)
+	// Set number to ignore and a modifier (for the Sudoku generator class)
 	bool mGenModifier;
-
-	// Number, row and col to ignore (for the generating Sudoku class)
 	Ignore mNumToIgnore;
 
-	// Vector of pointers to the solutions
-	std::vector<int*> mAllSolutions;
+private:
+	// Set and get element of 1D array using row and col
+	inline void setElement(const int row, const int col, const int num);
+	inline int getElement(const int row, const int col) const;
 
-	// Add current Sudoku array to all solutions 
-	void addArray();
-
-	// Delete all solutions
-	void deleteAllSolutions();
+	// Check if element is valid for its row, col, and the block of 3 x 3 its in
+	bool checkValid(const int inputRow, const int inputCol, const int num) const;
 
 public:
-	// Constructor
+	// Constructor for intialisation
 	SudokuSolver();
 
-	// Destructor
-	~SudokuSolver();
-
-	// Set Sudoku array, reset number of solutions, and assume unique solution is true
-	void setSudoku(int* inputArray);
-
-	// Set generator modifier (for the generator class)
+	// Set generator modifier (for the Sudoku generator class)
 	void setGenModifier(const bool input);
 
-	// Set Sudoku array overide function (for the generator class)
-	void setSudoku(int* inputArray, const Ignore& input);
-
-	// Set find first solution only flag
-	void setFirstSolutionOnly(const bool input);
-
-	// Return if unique solution
-	Unique isUniqueSolution() const;
-
-	// Get element from 1D array using row and col
-	inline int getElement(const int row, const int col);
+	// Set Sudoku array (Ignore input paramaters is for the Sudoku generator class)
+	void setSudoku(int* inputArray, const Ignore& ignoreInput = { 0, 0, 0 });
 
 	// Solve Sudoku with backtracking
 	bool solveSudoku();
 
-	// Display Sudoku to console 
-	void displaySudoku();
+	// Display Sudoku to console (for debugging)
+	void displaySudoku() const;
 
 };

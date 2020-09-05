@@ -1,29 +1,20 @@
 #include "SudokuGenerator.h"
 
 SudokuGenerator::SudokuGenerator()
-	: mSudokuArray(nullptr)
+	: mSudokuArray(nullptr), mSudokuSolution(nullptr)
 {
 
 }
 
 //--------------------------------------Private methods----------------------------------------//
-void SudokuGenerator::setSudoku(int* inputArray)
-{
-	mSudokuArray = inputArray;
-	clearSudoku();
-}
-
-void SudokuGenerator::clearSudoku()
-{
-	for (int i = 0; i < 81; i++)
-	{
-		mSudokuArray[i] = 0;
-	}
-}
-
 inline void SudokuGenerator::setElement(const int row, const int col, const int num)
 {
 	mSudokuArray[row * 9 + col] = num;
+}
+
+inline int SudokuGenerator::getElement(const int row, const int col) const
+{
+	return mSudokuArray[row * 9 + col];
 }
 
 void SudokuGenerator::swapNumbers(const int index1, const int index2)
@@ -32,19 +23,6 @@ void SudokuGenerator::swapNumbers(const int index1, const int index2)
 	mSudokuArray[index1] = mSudokuArray[index1] ^ mSudokuArray[index2];
 	mSudokuArray[index2] = mSudokuArray[index1] ^ mSudokuArray[index2];
 	mSudokuArray[index1] = mSudokuArray[index1] ^ mSudokuArray[index2];
-}
-
-void SudokuGenerator::fillNextRow(const int previousRow, const int nextRow, const int shifts)
-{
-	for (int col = 0; col < (9 - shifts); col++)
-	{
-		setElement(nextRow, col, getElement(previousRow, col + shifts));
-	}
-
-	for (int col = (9 - shifts); col < 9; col++)
-	{
-		setElement(nextRow, col, getElement(previousRow, col - 9 + shifts));
-	}
 }
 
 void SudokuGenerator::swapRows(const int row1, const int row2)
@@ -85,10 +63,31 @@ void SudokuGenerator::swapColBlocks(const int colBlock1, const int colBlock2)
 	}
 }
 
+void SudokuGenerator::fillNextRow(const int previousRow, const int nextRow, const int shifts)
+{
+	for (int col = 0; col < (9 - shifts); col++)
+	{
+		setElement(nextRow, col, getElement(previousRow, col + shifts));
+	}
+
+	for (int col = (9 - shifts); col < 9; col++)
+	{
+		setElement(nextRow, col, getElement(previousRow, col - 9 + shifts));
+	}
+}
+
+void SudokuGenerator::copyArray(int* copyArray) const
+{
+	for (int i = 0; i < 81; i++)
+	{
+		copyArray[i] = mSudokuArray[i];
+	}
+}
+
 void SudokuGenerator::createCompletedSudoku()
 {
 	// Set random seed using time
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 
 	// 1. Fill first row with numbers 1 to 9
 	for (int i = 0; i < 9; i++)
@@ -177,29 +176,23 @@ void SudokuGenerator::createCompletedSudoku()
 		}
 	}
 
-}
+	// 12. Store solution in solution array
+	copyArray(mSudokuSolution);
 
-void SudokuGenerator::copyArray(int* copyArray)
-{
-	for (int i = 0; i < 81; i++)
-	{
-		copyArray[i] = mSudokuArray[i];
-	}
 }
 
 //--------------------------------------Public methods----------------------------------------//
-inline int SudokuGenerator::getElement(const int row, const int col)
+void SudokuGenerator::generateSudoku(int* inputArray, int* solutionArray)
 {
-	return mSudokuArray[row * 9 + col];
-}
+	// Set the Sudoku array and solution array
+	mSudokuArray = inputArray;
+	mSudokuSolution = solutionArray;
 
-void SudokuGenerator::generateSudoku()
-{
 	// Create completed Sudoku
 	createCompletedSudoku();
 
 	// Set random seed using time
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 
 	// Create Sudoku solver object
 	SudokuSolver SS;
@@ -207,16 +200,13 @@ void SudokuGenerator::generateSudoku()
 	// Set the Sudoku solver to have the generator modifier
 	SS.setGenModifier(true);
 
-	// Set the Sudoku solver to find the first solution only
-	SS.setFirstSolutionOnly(true);
+	// Create array of bool types to track if elements have been removed from the main array
+	bool removed[81] = { };
 
-	// Create array of Element objects to track if they have been removed
-	RemovedElements elements[81];
-
-	// Create a temporary copy array
+	// Create a temporary duplicate array
 	int duplicateArray[81];
 
-	// Current number to be removed
+	// Current number to be determined to be removed
 	int removingNumber = 0;
 
 	// Elements to remove
@@ -227,29 +217,29 @@ void SudokuGenerator::generateSudoku()
 		// 1. Pick a random number you haven't tried removing before
 		int randRow = rand() % 9;
 		int randCol = rand() % 9;
-		if (!elements[randRow * 9 + randCol].removed)
+		if (!removed[randRow * 9 + randCol])
 		{
-			// 2. Remove the number, then run solver, but it cannot use the number removed
+			// 2. Remove the number, then run solver without the number to be determined to be removed
 			removingNumber = getElement(randRow, randCol);
 			copyArray(duplicateArray);
 			duplicateArray[randRow * 9 + randCol] = 0;
 			Ignore numToIgnore = { removingNumber, randRow, randCol };
 			SS.setSudoku(duplicateArray, numToIgnore);
 
-			// 3. If the solver does not find solution, then remove number
+			// 3. If the solver does not find a solution, then remove number
 			if (!SS.solveSudoku())
 			{
-				mSudokuArray[randRow * 9 + randCol] = 0;
-				elements[randRow * 9 + randCol].removed = true;
+				setElement(randRow, randCol, 0);
+				removed[randRow * 9 + randCol] = true;
 				toRemove--;
 			}
 		}
-		// 4. Repeat, until enough numbers removed (or unable to remove any more)
+		// 4. Repeat, until enough numbers removed
 	}
 
 }
 
-void SudokuGenerator::displaySudoku()
+void SudokuGenerator::displaySudoku() const
 {
 	for (int row = 0; row < 9; row++)
 	{
