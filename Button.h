@@ -1,3 +1,4 @@
+/* A button class with colours and a texture*/
 #pragma once
 #include <SDL.h>
 
@@ -16,8 +17,12 @@ private:
 	// Current button state
 	ButtonState mCurrentState;
 
-	// Top left position and dimensions of button
+	// Define texture to display
+	SDL_Texture* mTexture;
+
+	// Top left position and dimensions of button and texture
 	SDL_Rect mButtonRect;
+	SDL_Rect mTextureRect;
 
 	// Has the button been selected by the mouse
 	bool mSelected;
@@ -33,16 +38,30 @@ public:
 	// Constructor
 	Button();
 
-	// Set button SDL_Rect
-	void setButtonRect(const SDL_Rect& const rect);
+	// Set Texture
+	void setTexture(SDL_Texture* texture);
+
+	// Set button and texture SDL_Rect
+	void setButtonRect(const SDL_Rect& rect);
+	void setTextureRect(const SDL_Rect& rect);
+
+	// Center texture onto button
+	void centerTextureRect();
 
 	// Set selected
 	void setSelected(const bool selected);
 
-	// Handle events
-	void handleMouseEvent(const SDL_Event* const event, Button*& currentButtonSelected);
+	// Check if mouse is inside button
+	bool isMouseInside(const int x, const int y);
+	
+	// Get mouse event
+	ButtonState getMouseEvent(const SDL_Event* event);
+
+	// Set mouse down colour
+	void setMouseDownColour(const SDL_Color& colour);
 
 	// Render button and texture
 	void renderButton(SDL_Renderer* renderer);
+	void renderTexture(SDL_Renderer* renderer);
 
 };

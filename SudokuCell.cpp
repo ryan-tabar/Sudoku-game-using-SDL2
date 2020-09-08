@@ -13,7 +13,6 @@ void Sudoku::Cell::setNumber(const int number)
 	if (number == 0)
 	{
 		mCharNumber = ' ';
-		setEditable(true);
 	}
 	else
 	{
@@ -62,19 +61,18 @@ bool Sudoku::Cell::isEditable() const
 	return mEditable;
 }
 
-void Sudoku::Cell::handleKeyboardEvent(const SDL_Event* const event, SDL_Renderer* renderer, TTF_Font* font)
+void Sudoku::Cell::handleKeyboardEvent(const SDL_Event* event, SDL_Texture* textureCache[])
 {
-	if (event->type == SDL_KEYDOWN)
+	// Handle backspace
+	if (event->key.keysym.sym == SDLK_BACKSPACE && mCharNumber != ' ')
 	{
-		// Handle backspace
-		if (event->key.keysym.sym == SDLK_BACKSPACE && mCharNumber != ' ')
-		{
-			// Empty char
-			mCharNumber = ' ';
-			loadFontTexture(renderer, font, mCharNumber);
-		}
+		// Empty char
+		mCharNumber = ' ';
+
+		// Set empty texture
+		setTexture(textureCache[0]);
 	}
-	// Special text input event
+	// Handle text input
 	else if (event->type == SDL_TEXTINPUT)
 	{
 		// Check if integer > 0
@@ -82,10 +80,14 @@ void Sudoku::Cell::handleKeyboardEvent(const SDL_Event* const event, SDL_Rendere
 		{
 			// Replace char
 			mCharNumber = *(event->text.text);
-			loadFontTexture(renderer, font, mCharNumber);
+
+			// Set character based on number
+			setTexture(textureCache[atoi(event->text.text)]);
+
 		}
 	}
 }
+
 
 bool Sudoku::Cell::isCorrect() const
 {

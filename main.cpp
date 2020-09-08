@@ -3,7 +3,10 @@
 
 int main(int argc, char* argv[])
 {
-	Sudoku::Game S;
+	// Create Sudoku game object
+	Sudoku::Sudoku S;
+
+	// Play Sudoku
 	S.play();
 
 	return 0;

@@ -5,11 +5,10 @@
 #include <stdlib.h> // for atoi
 
 #include "Button.h"
-#include "Texture.h"
 
 namespace Sudoku
 {
-	class Cell : public Button, public Texture
+	class Cell : public Button
 	{
 	private:
 		// Define editiability (can type number in cell)
@@ -35,7 +34,7 @@ namespace Sudoku
 		bool isEditable() const;
 
 		// Handle events
-		void handleKeyboardEvent(const SDL_Event* const event, SDL_Renderer* renderer, TTF_Font* font);
+		void handleKeyboardEvent(const SDL_Event* event, SDL_Texture* textureCache[]);
 
 		// Compare number with solution
 		bool isCorrect() const;
