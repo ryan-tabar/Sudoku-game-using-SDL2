@@ -1,2 +1,2 @@
-# SDL2-Test
+# Sudoku game using SDL2
 Testing SDL2
