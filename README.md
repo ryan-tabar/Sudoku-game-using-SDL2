@@ -10,7 +10,7 @@
 - Click "Clone a repository"
 - Copy and paste respository link
 - Hit F5 to build and run (in either Debug or Release)
-- If you want to run from the generated executable, make sure the dll and resource folder are in the same directory as the executable.
+- If you want to run from the generated executable, make sure the dll files and resource folder are in the same directory as the executable.
 
 ## Framework diagram
 Key: 
