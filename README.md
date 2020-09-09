@@ -3,7 +3,7 @@
 
 ## Requirements
 - Microsoft Visual Studio
-- SDL2 (already included in dependicies)
+- SDL2 (already included in Dependencies folder)
 
 ## How to build and run
 - Open Microsoft Visual Studio
