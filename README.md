@@ -3,7 +3,7 @@
 
 ## Requirements
 - Microsoft Visual Studio
-- SDL2 and SDL TTF (already included in Dependencies folder)
+- SDL2 (already included in Dependencies folder)
 
 ## How to build and run
 - Open Microsoft Visual Studio
@@ -11,4 +11,18 @@
 - Hit F5 to build and run (in either Debug or Release)
 - Play Sudoku!
 
-## Sudoku program framework
+## Framework diagram
+Key: 
+  - Arrow = inheritance
+  - Line = composition
+
+![Framework](Resources/SudokuFramework.png?raw=true)
+
+- All cells and the stopwatch act as buttons 
+- The stopwatch and any cell set to a non-zero value during the generation of the puzzle act as buttons that cannot be clicked
+- "New" button generates a new Sudoku
+- "Check" checks if attempt is correct
+
+## Possible things to add
+- Add difficulty setting by changing the number of cells removed in the generator class
+- When a cell is selected, highlight the block of 9, row of 9, and column of 9 and show which numbers cannot be placed in that cell
