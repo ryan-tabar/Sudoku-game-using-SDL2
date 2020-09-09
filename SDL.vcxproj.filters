@@ -35,12 +35,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CleanUp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourcePath.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SudokuGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
