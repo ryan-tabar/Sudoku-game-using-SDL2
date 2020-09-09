@@ -8,6 +8,7 @@
 ## How to build and run
 - Open Microsoft Visual Studio
 - Click "Clone a repository"
+- Copy and paste respository link
 - Hit F5 to build and run (in either Debug or Release)
 - Play Sudoku!
 
