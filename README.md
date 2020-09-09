@@ -9,3 +9,6 @@
 - Open Microsoft Visual Studio
 - Click "Clone a repository"
 - Hit F5 to build and run (in either Debug or Release)
+- Play Sudoku!
+
+## Sudoku program framework
