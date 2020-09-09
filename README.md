@@ -1,3 +1,3 @@
 # Sudoku game using SDL2
 Testing SDL2
-![GitHub Logo](/Dependicies/ScreenshotOfMySudokuProgram.png)
+![alt text](https://github.com/[SirFourier]/[Sudoku-game-using-SDL2]/blob/[master]/ScreenshotOfMySudokuProgram.png?raw=true)
