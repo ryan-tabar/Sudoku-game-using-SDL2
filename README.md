@@ -18,7 +18,7 @@ Key:
 
 ![Framework](Resources/SudokuFramework.png?raw=true)
 
-- All cells and the stopwatch act as buttons 
+- All 81 (9 x 9) cells and the stopwatch act as buttons 
 - The stopwatch and any cell set to a non-zero value during the generation of the puzzle act as buttons that cannot be clicked
 - "New" button generates a new Sudoku
 - "Check" checks if attempt is correct
