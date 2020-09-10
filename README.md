@@ -3,7 +3,7 @@
 
 ## Requirements
 - Microsoft Visual Studio
-- SDL2 and SDL TTF (already included in Dependencies folder)
+- SDL2 and SDL_TTF2 (already included in Dependencies folder)
 
 ## How to build and run
 - Open Microsoft Visual Studio
