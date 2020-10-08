@@ -72,18 +72,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+    <OutDir>$(SolutionDir)bin\$(PlatformTarget)\$(Configuration)</OutDir>
+    <IntDir>$(SolutionDir)intermediates\$(PlatformTarget)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+    <OutDir>$(SolutionDir)bin\$(PlatformTarget)\$(Configuration)</OutDir>
+    <IntDir>$(SolutionDir)intermediates\$(PlatformTarget)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+    <OutDir>$(SolutionDir)bin\$(PlatformTarget)\$(Configuration)</OutDir>
+    <IntDir>$(SolutionDir)intermediates\$(PlatformTarget)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+    <OutDir>$(SolutionDir)bin\$(PlatformTarget)\$(Configuration)</OutDir>
+    <IntDir>$(SolutionDir)intermediates\$(PlatformTarget)\$(Configuration)</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -150,19 +158,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Button.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Sudoku.cpp" />
-    <ClCompile Include="SudokuCell.cpp" />
-    <ClCompile Include="SudokuGenerator.cpp" />
-    <ClCompile Include="SudokuSolver.cpp" />
+    <ClCompile Include="src\Button.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Sudoku.cpp" />
+    <ClCompile Include="src\SudokuCell.cpp" />
+    <ClCompile Include="src\SudokuGenerator.cpp" />
+    <ClCompile Include="src\SudokuSolver.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Button.h" />
-    <ClInclude Include="Sudoku.h" />
-    <ClInclude Include="SudokuCell.h" />
-    <ClInclude Include="SudokuGenerator.h" />
-    <ClInclude Include="SudokuSolver.h" />
+    <ClInclude Include="src\Button.h" />
+    <ClInclude Include="src\Sudoku.h" />
+    <ClInclude Include="src\SudokuCell.h" />
+    <ClInclude Include="src\SudokuGenerator.h" />
+    <ClInclude Include="src\SudokuSolver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

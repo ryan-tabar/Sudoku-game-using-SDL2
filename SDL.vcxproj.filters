@@ -15,39 +15,39 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\Sudoku.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SudokuGenerator.cpp">
+    <ClCompile Include="src\SudokuCell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SudokuSolver.cpp">
+    <ClCompile Include="src\SudokuGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Sudoku.cpp">
+    <ClCompile Include="src\SudokuSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SudokuCell.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Button.cpp">
+    <ClCompile Include="src\Button.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SudokuGenerator.h">
+    <ClInclude Include="src\SudokuSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SudokuSolver.h">
+    <ClInclude Include="src\Sudoku.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sudoku.h">
+    <ClInclude Include="src\SudokuCell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SudokuCell.h">
+    <ClInclude Include="src\SudokuGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Button.h">
+    <ClInclude Include="src\Button.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -57,7 +57,7 @@ bool Sudoku::Sudoku::initialiseSDL()
 	}
 
 	// Load font for text
-	mFont = TTF_OpenFont("Resources/octin sports free.ttf", mFontSize);
+	mFont = TTF_OpenFont("assets/octin sports free.ttf", mFontSize);
 	if (mFont == nullptr)
 	{
 		std::cout << "Failed to load lazy font! Error: " << TTF_GetError() << std::endl;
