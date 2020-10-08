@@ -1,5 +1,5 @@
 # Sudoku game in C++ using SDL2
-![ScreenshotOfProgram](Resources/ScreenshotOfProgram.png?raw=true)
+![ScreenshotOfProgram](assets/ScreenshotOfProgram.png?raw=true)
 
 ## Requirements
 - Microsoft Visual Studio
@@ -17,7 +17,7 @@ Key:
   - Arrow = inheritance
   - Line = composition
 
-![Framework](Resources/SudokuFramework.png?raw=true)
+![Framework](assets/SudokuFramework.png?raw=true)
 
 - All 81 (9 x 9) cells and the stopwatch act as buttons 
 - The stopwatch and any cell set to a non-zero value during the generation of the puzzle act as buttons that cannot be clicked
